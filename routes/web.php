@@ -13,8 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('home', function () {
+    return view('home');
+})->name('home');
 
-Route::get('products', 'ProductsController@index')->name('products.index');
+
+Route::get('products', 'App\Http\Controllers\ProductController@index')->name('products.index');
+Route::get('basket/add/{product}', 'App\Http\Controllers\BasketController@add')->name('basket.add');

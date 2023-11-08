@@ -2,7 +2,7 @@
 
 namespace App\Support\Storage;
 
-use App\Support\Contracts\StorageInterface;
+use App\Support\Storage\Contracts\StorageInterface;
 use Countable;
 
 

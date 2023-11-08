@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Contracts;
+namespace App\Support\Storage\Contracts;
 
 interface StorageInterface
 {
