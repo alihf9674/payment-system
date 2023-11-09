@@ -48,4 +48,13 @@ class Basket
     {
         return $this->storage->exists($product->id);
     }
+
+    /**
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function itemCount(): int
+    {
+        return $this->storage->count();
+    }
 }
