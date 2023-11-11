@@ -15,6 +15,26 @@ class Basket
         $this->storage = $storage;
     }
 
+    public function all()
+    {
+        $products = Product::find(array_keys($this->storage->all()));
+
+        foreach ($products as $product) {
+            $product->quantity = $this->get($product)['quantity'];
+        }
+        return $products;
+    }
+
+    public function subTotal()
+    {
+        $total = 0;
+
+        foreach ($this->all() as $product) {
+            $total += $product->price * $product->quantity;
+        }
+        return $total;
+    }
+
     /**
      * @throws QuantityExceededException
      */

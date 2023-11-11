@@ -15,6 +15,12 @@ class BasketController extends Controller
         $this->basket = $basket;
     }
 
+    public function index()
+    {
+        $items = $this->basket->all();
+        return view('basket', compact('items'));
+    }
+
     public function add(Product $product): \Illuminate\Http\RedirectResponse
     {
         try {

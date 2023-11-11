@@ -8,7 +8,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="auth-btn collapse justify-content-end navbar-collapse">
-        <a href="" class="btn btn-info mr-2">
+        <a href="{{route('baskets.index')}}" class="btn btn-info mr-2">
             @lang('payment.basket') <span class="badge badge-light">{{$basket->itemCount}}</span>
         </a>
         @guest

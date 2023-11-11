@@ -19,4 +19,6 @@ Route::get('home', function () {
 
 
 Route::get('products', 'App\Http\Controllers\ProductController@index')->name('products.index');
+
+Route::get('basket', 'App\Http\Controllers\BasketController@index')->name('basket.index');
 Route::get('basket/add/{product}', 'App\Http\Controllers\BasketController@add')->name('basket.add');

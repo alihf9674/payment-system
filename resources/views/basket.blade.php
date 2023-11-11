@@ -8,7 +8,11 @@
 		@include('partials.alerts')
 	</div>
 
-
+@if($items->isEmpty())
+    <p>
+        @lang('payment.empty basket',['link' => route('products.index')])
+    </p>
+    @else
 	<div class="row">
 		<div class="col-md-7 card bg-light mr-3">
 			<div class="card-body well">
@@ -23,8 +27,9 @@
 					<tbody>
 						@foreach ($items as $item)
 							<tr>
-							<td>  </td>
-							<td> </td>
+							<td>  {{$item->title}}</td>
+							<td>{{number_format($item->price)}} @lang('payment.toman')</td>
+                                <td>{{$item->quantity}}</td>
 							<td>
 							<form action="" method="post" class="form-inline">
 									@csrf

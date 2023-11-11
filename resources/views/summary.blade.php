@@ -1,3 +1,4 @@
+@inject('basket' , 'App\Support\Basket\Basket')
 
 <div class="card bg-light">
 	<div class="card-body">
@@ -7,15 +8,15 @@
 			<table class='table'>
 				<tr>
 					<td>@lang('payment.item total')</td>
-					<td>@lang('payment.toman')</td>
+					<td>{{number_format($basket->subTotal())}}@lang('payment.toman')</td>
 				</tr>
 				<tr>
 					<td>@lang('payment.shipping')</td>
-					<td>  @lang('payment.toman')</td>
+					<td> {{number_format(100000)}} @lang('payment.toman')</td>
 				</tr>
 				<tr>
 					<td>@lang('payment.basket total')</td>
-					<td> @lang('payment.toman')</td>
+					<td> {{number_format($basket->subTotal() + 100000)}}@lang('payment.toman')</td>
 				</tr>
 			</table>
 		</div>
