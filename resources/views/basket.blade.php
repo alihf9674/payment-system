@@ -48,7 +48,7 @@
 		</div>
 		<div class="col-md-4">
 			@include('summary')
-		<a href="" class="btn mt-4  btn-primary btn-lg w-100 d-block">@lang('payment.confirm and continue')</a>
+		<a href="{{route('basket.checkout.form')}}" class="btn mt-4  btn-primary btn-lg w-100 d-block">@lang('payment.confirm and continue')</a>
 		</div>
 	</div>
 	@endif

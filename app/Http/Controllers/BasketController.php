@@ -39,4 +39,22 @@ class BasketController extends Controller
         $this->basket->update($product, $request->quantity);
         return back();
     }
+
+    public function checkoutForm()
+    {
+        return view('checkout');
+    }
+
+    public function checkout(Request $request)
+    {
+        $this->validateForm($request);
+    }
+
+    private function validateForm($request)
+    {
+        $request->validate([
+            'method' => ['required'],
+            'getway' => ['required_if:method,online']
+        ]);
+    }
 }
