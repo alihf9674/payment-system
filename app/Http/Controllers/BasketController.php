@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\QuantityExceededException;
 use App\Models\Product;
 use App\Support\Basket\Basket;
+use Illuminate\Http\Request;
 
 class BasketController extends Controller
 {
@@ -31,5 +32,11 @@ class BasketController extends Controller
         } catch (QuantityExceededException $e) {
             return back()->with('error', __('payment.quantity exceeded'));
         }
+    }
+
+    public function update(Request $request, Product $product): \Illuminate\Http\RedirectResponse
+    {
+        $this->basket->update($product, $request->quantity);
+        return back();
     }
 }

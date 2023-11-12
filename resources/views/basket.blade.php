@@ -29,21 +29,19 @@
 							<tr>
 							<td>  {{$item->title}}</td>
 							<td>{{number_format($item->price)}} @lang('payment.toman')</td>
-                                <td>{{$item->quantity}}</td>
 							<td>
-							<form action="" method="post" class="form-inline">
-									@csrf
-									<select name="quantity" id="quantity" class="form-control input-sm mr-sm-2">
-
-									<option  value=""></option>
-
-									</select>
-									<button type="submit" class="btn btn-primary btn-sm">@lang('payment.update')</button>
-								</form>
-							</td>
-						</tr>
-						@endforeach
-
+                                <form action="{{route('basket.update' , $item->id)}}" method="post" class="form-inline">
+                                    @csrf
+                                    <select name="quantity" id="quantity" class="form-control input-sm mr-sm-2">
+                                        @for ($i = 0; $i <= $item->stock; $i++)
+                                            <option {{$item->quantity == $i ? 'selected' : ''}} value="{{$i}}">{{$i}}</option>
+                                        @endfor
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm">@lang('payment.update')</button>
+                                </form>
+                            </td>
+                            </tr>
+                        @endforeach
 					</tbody>
 				</table>
 			</div>

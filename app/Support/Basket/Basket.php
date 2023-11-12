@@ -51,8 +51,9 @@ class Basket
      */
     public function update(Product $product, int $quantity)
     {
-        if (!$product->hasStock($quantity))
-            throw new QuantityExceededException();
+        if (!$product->hasStock($quantity)) throw new QuantityExceededException();
+
+        if (!$quantity) return $this->storage->unset($product->id);
 
         $this->storage->set($product->id, [
             'quantity' => $quantity

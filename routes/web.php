@@ -22,3 +22,4 @@ Route::get('products', 'App\Http\Controllers\ProductController@index')->name('pr
 
 Route::get('basket', 'App\Http\Controllers\BasketController@index')->name('basket.index');
 Route::get('basket/add/{product}', 'App\Http\Controllers\BasketController@add')->name('basket.add');
+Route::post('basket/update/{product}', 'App\Http\Controllers\BasketController@update')->name('basket.update');
