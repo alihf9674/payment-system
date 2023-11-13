@@ -78,4 +78,9 @@ class Basket
     {
         return $this->storage->count();
     }
+
+    public function clear()
+    {
+        return $this->storage->clear();
+    }
 }
