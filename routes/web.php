@@ -25,3 +25,4 @@ Route::get('basket/add/{product}', 'App\Http\Controllers\BasketController@add')-
 Route::post('basket/update/{product}', 'App\Http\Controllers\BasketController@update')->name('basket.update');
 Route::get('basket/checkout', 'App\Http\Controllers\BasketController@checkoutForm')->name('basket.checkout.form')->middleware('auth');
 Route::post('basket/checkout', 'App\Http\Controllers\BasketController@checkout')->name('basket.checkout')->middleware('auth');
+Route::post('payment/{gateway}/callback','App\Http\Controllers\PaymentController@verify')->name('payment.verify');
