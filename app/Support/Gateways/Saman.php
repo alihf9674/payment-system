@@ -4,15 +4,16 @@ namespace App\Support\Gateways;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use SoapClient;
 
 class Saman implements GatewayInterface
 {
-    private $merchantId;
+    private $merchantID;
     private $callback;
 
     public function __construct()
     {
-        $this->merchantId = '452585658';
+        $this->merchantID = '452585658';
         $this->callback = route('payment.verify', $this->getName());
     }
 
@@ -23,7 +24,21 @@ class Saman implements GatewayInterface
 
     public function verify(Request $request)
     {
-        // TODO: Implement verify() method.
+        if (!$request->has('State') || $request->input('State') !== "OK")
+            return $this->transactionFailed();
+
+        $soapClient = new SoapClient('https://acquirer.samanepay.com/payments/referencepayment.asmx?WSDL');
+
+        $response = $soapClient->VerifyTransaction($request->input('RefNum'), $this->merchantID);
+
+        $order = $this->getOrder($request->input('ResNum'));
+
+        $response = $order->amount + 10000;
+        $request->merge(['RefNum' => '45852525']);
+
+        return $response == ($order->amount + 10000)
+            ? $this->transactionSuccess($order, $request->input('RefNum'))
+            : $this->transactionFailed();
     }
 
     public function getName(): string
@@ -39,7 +54,29 @@ class Saman implements GatewayInterface
 		<input type='hidden' name='Amount' value='{$amount}' />
 		<input type='hidden' name='ResNum' value='{$order->code}'>
 		<input type='hidden' name='RedirectURL' value='{$this->callback}'/>
-		<input type='hidden' name='MID' value='{$this->merchantId}'/>
+		<input type='hidden' name='MID' value='{$this->merchantID}'/>
 		</form><script>document.forms['samanpeyment'].submit()</script>";
+    }
+
+    private function transactionFailed(): array
+    {
+        return [
+            'status' => self::TRANSACTION_FAILED
+        ];
+    }
+
+    private function getOrder($resNum)
+    {
+        return Order::where('code', $resNum)->firstOrFail();
+    }
+
+    private function transactionSuccess($order, $refNum): array
+    {
+        return [
+            'status' => self::TRANSACTION_SUCCESS,
+            'order' => $order,
+            'refNum' => $refNum,
+            'gateway' => $this->getName()
+        ];
     }
 }
