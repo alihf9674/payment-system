@@ -32,6 +32,8 @@ class Transaction
             return $this->gateWayFactory()->pay($order);
         }
 
+        $this->normalizeQuantity($order);
+
         $this->basket->clear();
 
         return $order;
@@ -44,6 +46,8 @@ class Transaction
         if ($result['status'] === GatewayInterface::TRANSACTION_FAILED) return false;
 
         $this->confirmPayment($result);
+
+        $this->normalizeQuantity($result['order']);
 
         $this->basket->clear();
 
@@ -90,6 +94,13 @@ class Transaction
         ][$this->request->gateway];
 
         return resolve($gateway);
+    }
+
+    private function normalizeQuantity($order)
+    {
+        foreach ($order->products as $product) {
+            $product->decrementStock($product->pivot->quantity);
+        }
     }
 
     private function confirmPayment($result)
