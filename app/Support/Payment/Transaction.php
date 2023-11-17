@@ -8,7 +8,9 @@ use App\Support\Basket\Basket;
 use App\Support\Gateways\GatewayInterface;
 use App\Support\Gateways\Pasargad;
 use App\Support\Gateways\Saman;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class Transaction
@@ -24,13 +26,18 @@ class Transaction
 
     public function checkout()
     {
-        $order = $this->makeOrder();
+        DB::beginTransaction();
+        try {
+            $order = $this->makeOrder();
+            $payment = $this->makePayment($order);
 
-        $payment = $this->makePayment($order);
-
-        if ($payment->isOnline()) {
-            return $this->gateWayFactory()->pay($order);
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            return null;
         }
+
+        if ($payment->isOnline()) return $this->gateWayFactory()->pay($order);
 
         $this->normalizeQuantity($order);
 
