@@ -2,6 +2,7 @@
 
 namespace App\Support\Payment;
 
+use App\Events\OrderRegistered;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Support\Basket\Basket;
@@ -32,21 +33,19 @@ class Transaction
             $payment = $this->makePayment($order);
 
             DB::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return null;
         }
 
-        if ($payment->isOnline()) return $this->gateWayFactory()->pay($order);
+        if ($payment->isOnline()) return $this->gatewayFactory()->pay($order);
 
-        $this->normalizeQuantity($order);
-
-        $this->basket->clear();
+        $this->completeOrder($order);
 
         return $order;
     }
 
-    public function verify()
+    public function verify(): bool
     {
         $result = $this->gatewayFactory()->verify($this->request);
 
@@ -54,11 +53,41 @@ class Transaction
 
         $this->confirmPayment($result);
 
-        $this->normalizeQuantity($result['order']);
-
-        $this->basket->clear();
+        $this->completeOrder($result['order']);
 
         return true;
+    }
+
+    private function completeOrder($order)
+    {
+        $this->normalizeQuantity($order);
+
+        event(new OrderRegistered($order));
+
+        $this->basket->clear();
+    }
+
+    private function normalizeQuantity($order)
+    {
+        foreach ($order->products as $product) {
+            $product->decrementStock($product->pivot->quantity);
+        }
+    }
+
+    private function confirmPayment($result): void
+    {
+        $result['order']->payment->confirm($result['refNum'], $result['gateway']);
+    }
+
+    private function gatewayFactory()
+    {
+        $gateway = [
+            'saman' => Saman::class,
+            'pasargad' => Pasargad::class
+        ]
+        [$this->request->gateway];
+
+        return resolve($gateway);
     }
 
     private function makeOrder()
@@ -74,16 +103,6 @@ class Transaction
         return $order;
     }
 
-    private function products(): array
-    {
-        $products = [];
-        foreach ($this->basket->all() as $product) {
-            $products[$product->id] = ['quantity' => $product->quantity];
-        }
-
-        return $products;
-    }
-
     private function makePayment($order)
     {
         return Payment::create([
@@ -93,25 +112,12 @@ class Transaction
         ]);
     }
 
-    private function gateWayFactory()
+    private function products(): array
     {
-        $gateway = [
-            'saman' => Saman::class,
-            'pasargad' => Pasargad::class
-        ][$this->request->gateway];
-
-        return resolve($gateway);
-    }
-
-    private function normalizeQuantity($order)
-    {
-        foreach ($order->products as $product) {
-            $product->decrementStock($product->pivot->quantity);
+        foreach ($this->basket->all() as $product) {
+            $products[$product->id] = ['quantity' => $product->quantity];
         }
-    }
 
-    private function confirmPayment($result)
-    {
-        $result['order']->payment->confirm($result['refNum'], $result['gateway']);
+        return $products;
     }
 }
